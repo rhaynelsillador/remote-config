@@ -9,6 +9,7 @@ export async function create(key?: string, code?: string, value?: string, meta?:
 				values
 				(${key}, ${code}, ${value}, ${meta}, ${platform}, ${"default"}, ${"*"})
 				`
+		console.log("flagflag" , flag)
 		return Promise.resolve(true)
 	} catch (err) {
 		console.log(err)

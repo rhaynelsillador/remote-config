@@ -1,0 +1,1 @@
+export const dataTypes = ["String", "Number", "Boolean", "Object", "Group"];

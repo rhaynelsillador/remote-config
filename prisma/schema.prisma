@@ -1,0 +1,67 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "darwin-arm64", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model parameters {
+  id                  Int                   @id @default(autoincrement())
+  code                String?               @db.VarChar(255)
+  key                 String?               @db.VarChar(255)
+  targeting_key       Int?
+  variant             String?               @db.VarChar(255)
+  default_value       String?               @db.VarChar(255)
+  environment         String?               @db.VarChar(255)
+  is_active           Boolean?              @default(true)
+  created_at          DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?             @default(now()) @updatedAt @db.Timestamp(6)
+  description         String?
+  parameter_condition parameter_condition[]
+  targetingParam      parameters?           @relation("TargetingRelation", fields: [targeting_key], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sub_params          parameters[]          @relation("TargetingRelation")
+}
+
+model conditions {
+  id                  Int                   @id @default(autoincrement())
+  name                String?               @db.VarChar(255)
+  description         String?               @db.VarChar(255)
+  condition_json      Json?                 @db.Json
+  created_at          DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?             @default(now()) @updatedAt @db.Timestamp(6)
+  parameter_condition parameter_condition[]
+}
+
+model flags {
+  id          Int       @id @default(autoincrement())
+  created_at  DateTime  @default(now()) @db.Timestamp(6)
+  name        String?   @db.VarChar(255)
+  value       String?
+  description String?   @db.VarChar(255)
+  updated_at  DateTime? @updatedAt @db.Timestamp(6)
+}
+
+model parameter_condition {
+  id              Int         @id @default(autoincrement())
+  condition_id    Int?
+  parameter_id    Int?
+  condition_order Int?        @default(1)
+  value           String?     @db.VarChar(255)
+  created_at      DateTime?   @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?   @default(now()) @db.Timestamp(6)
+  conditions      conditions? @relation(fields: [condition_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parameters      parameters? @relation(fields: [parameter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model parameter_versions {
+  id      Int @id @default(autoincrement())
+  version Int
+}
+
+model schema_migrations {
+  version BigInt  @id
+  dirty   Boolean
+}
